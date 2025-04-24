@@ -1,0 +1,76 @@
+service: hostel-outpass-system
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: ${opt:stage, 'dev'}
+  region: us-east-1
+  environment:
+    DB_WRITER_HOST: ${env:DB_WRITER_HOST}
+    DB_READER_HOST: ${env:DB_READER_HOST}
+    DB_NAME: ${env:DB_NAME}
+    DB_USER: ${env:DB_USER}
+    DB_PASSWORD: ${env:DB_PASSWORD}
+    S3_BUCKET: ${env:S3_BUCKET}
+    SES_EMAIL: ${env:SES_EMAIL}
+    SNS_TOPIC_ARN: ${env:SNS_TOPIC_ARN}
+    API_ENDPOINT: ${env:API_ENDPOINT, 'http://localhost:3000'}
+    REACT_APP_API_URL: ${env:REACT_APP_API_URL, 'http://localhost:3000'}
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - ses:SendEmail
+        - ses:SendRawEmail
+        - sns:Publish
+        - s3:PutObject
+      Resource: "*"
+
+functions:
+  requestOutpass:
+    handler: handler.requestOutpass
+    timeout: 900
+    events:
+      - http:
+          path: outpass-request
+          method: post
+          cors: true
+
+  processApproval:
+    handler: handler.processApproval
+    timeout: 900
+    events:
+      - http:
+          path: approve
+          method: post
+          cors: true
+
+  verifyQR:
+    handler: handler.verifyQR
+    timeout: 900
+    events:
+      - http:
+          path: verify
+          method: get
+          cors: true
+  verifyRecord:
+    handler: handler.verifyRecord
+    timeout: 900
+    events:
+      - http:
+          path: verifyRecord
+          method: get
+          cors: true
+
+plugins:
+  - serverless-offline
+  - serverless-dotenv-plugin
+
+custom:
+  serverless-offline:
+    httpPort: 3000
+    noPrependStageInUrl: true
+  cors:
+    allowOrigin: '*'
+    allowHeaders: ['Content-Type', 'Authorization']
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']

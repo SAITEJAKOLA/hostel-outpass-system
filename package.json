@@ -1,0 +1,30 @@
+{
+	"name": "hostel-outpass-system",
+	"version": "1.0.0",
+	"description": "Hostel Outpass Management System",
+	"main": "handler.js",
+	"scripts": {
+		"start": "serverless offline start --httpPort 3000",
+		"frontend": "cd frontend && npm start",
+		"dev": "concurrently \"npm run start\" \"npm run frontend\"",
+		"deploy": "serverless deploy",
+		"deploy:frontend": "cd frontend && npm run build",
+		"test": "jest"
+	},
+	"dependencies": {
+		"@aws-sdk/client-s3": "^3.x",
+		"@aws-sdk/client-ses": "^3.x",
+		"@aws-sdk/client-sns": "^3.x",
+		"@aws-sdk/s3-request-presigner": "^3.x",
+		"pg": "^8.11.3",
+		"qrcode": "^1.5.3"
+	},
+	"devDependencies": {
+		"concurrently": "^8.0.0",
+		"cross-env": "^7.0.3",
+		"jest": "^29.7.0",
+		"serverless": "^3.38.0",
+		"serverless-dotenv-plugin": "^6.0.0",
+		"serverless-offline": "^13.3.0"
+	}
+}
